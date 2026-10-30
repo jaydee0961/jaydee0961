@@ -461,12 +461,138 @@ th {
 </section>
 
 <!-- SYSTEM SETTINGS -->
-<section class="panel settings-note" id="system-settings">
-    <h2>System Settings</h2>
-    <p>
-        System settings controls are not connected yet.
-        This section is reserved for the next development step.
-    </p>
+<section class="panel settings-note" id="system-settings" style="display:none;">
+    <div class="panel-header">
+        <div>
+            <h2>General Settings</h2>
+            <p>Manage your JJCC Railways system information.</p>
+        </div>
+    </div>
+    <form id="generalSettingsForm">
+        <div class="admin-form-group">
+            <label for="systemName">System Name</label>
+            <input type="text" id="systemName" maxlength="120" placeholder="JJCC Railways" required>
+        </div>
+        <div class="admin-form-group">
+            <label for="logoUrl">Logo URL</label>
+            <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
+        </div>
+        <div class="admin-form-group">
+            <label for="supportEmail">Support Email</label>
+            <input type="email" id="supportEmail" maxlength="254" placeholder="support@example.com">
+        </div>
+        <div class="admin-form-group">
+            <label for="supportPhone">Support Phone</label>
+            <input type="tel" id="supportPhone" maxlength="40" placeholder="Enter support phone">
+        </div>
+        <button type="submit" class="add-admin-btn" id="saveGeneralSettings">SAVE GENERAL SETTINGS</button>
+        <p class="status" id="generalSettingsMessage" role="status" aria-live="polite"></p>
+    </form>
+
+    <div class="panel-header" style="margin-top:32px;">
+        <div>
+            <h2>Reservation Settings</h2>
+            <p>Control booking availability and reservation deadlines.</p>
+        </div>
+    </div>
+    <form id="reservationSettingsForm">
+        <div class="admin-form-group">
+            <label for="maxBookingDays">Maximum Booking Days</label>
+            <input type="number" id="maxBookingDays" min="1" max="365" required>
+            <small>How many days in advance passengers can book.</small>
+        </div>
+        <div class="admin-form-group">
+            <label for="cancellationHours">Cancellation Deadline (Hours)</label>
+            <input type="number" id="cancellationHours" min="0" max="720" required>
+            <small>Minimum number of hours before departure to allow cancellation.</small>
+        </div>
+        <div class="admin-form-group">
+            <label for="bookingEnabled">Booking Availability</label>
+            <select id="bookingEnabled" required>
+                <option value="true">Enabled — Accept reservations</option>
+                <option value="false">Disabled — Stop new reservations</option>
+            </select>
+        </div>
+        <button type="submit" class="add-admin-btn" id="saveReservationSettings">SAVE RESERVATION SETTINGS</button>
+        <p class="status" id="reservationSettingsMessage" role="status" aria-live="polite"></p>
+    </form>
+
+    <div class="panel-header" style="margin-top:32px;">
+        <div>
+            <h2>Maintenance Mode</h2>
+            <p>Control whether the railway system is marked as under maintenance.</p>
+        </div>
+    </div>
+    <form id="maintenanceSettingsForm">
+        <div class="admin-form-group">
+            <label for="maintenanceMode">Maintenance Status</label>
+            <select id="maintenanceMode" required>
+                <option value="false">OFF — System operating normally</option>
+                <option value="true">ON — Maintenance mode enabled</option>
+            </select>
+            <small>Turning this on saves the maintenance status in Supabase. The public pages must also check this setting before users are blocked from booking or signing in.</small>
+        </div>
+        <button type="submit" class="add-admin-btn" id="saveMaintenanceSettings">SAVE MAINTENANCE SETTINGS</button>
+        <p class="status" id="maintenanceSettingsMessage" role="status" aria-live="polite"></p>
+    </form>
+
+    <div class="panel-header" style="margin-top:32px;">
+        <div>
+            <h2>Security Settings</h2>
+            <p>Configure recommended account and session security limits.</p>
+        </div>
+    </div>
+    <form id="securitySettingsForm">
+        <div class="admin-form-group">
+            <label for="minimumPasswordLength">Minimum Password Length</label>
+            <input type="number" id="minimumPasswordLength" min="8" max="64" required>
+            <small>Recommended minimum is 8 characters.</small>
+        </div>
+        <div class="admin-form-group">
+            <label for="maxLoginAttempts">Maximum Login Attempts</label>
+            <input type="number" id="maxLoginAttempts" min="3" max="10" required>
+            <small>Configured limit before additional protection should be applied.</small>
+        </div>
+        <div class="admin-form-group">
+            <label for="sessionTimeoutMinutes">Session Timeout (Minutes)</label>
+            <input type="number" id="sessionTimeoutMinutes" min="5" max="1440" required>
+            <small>Target idle session duration.</small>
+        </div>
+        <div class="admin-form-group">
+            <label for="requireEmailVerification">Email Verification</label>
+            <select id="requireEmailVerification" required>
+                <option value="true">Required</option>
+                <option value="false">Not required</option>
+            </select>
+        </div>
+        <button type="submit" class="add-admin-btn" id="saveSecuritySettings">SAVE SECURITY SETTINGS</button>
+        <p class="status" id="securitySettingsMessage" role="status" aria-live="polite"></p>
+        <small>Note: These values are stored as security configuration. Login-attempt blocking and idle-session enforcement must also be implemented in Supabase Auth / application logic before they take effect.</small>
+    </form>
+
+    <div class="panel-header" style="margin-top:32px;">
+        <div>
+            <h2>Activity Logs</h2>
+            <p>Review important actions performed in the JJCC Railways admin portal.</p>
+        </div>
+        <button type="button" class="refresh-btn" id="refreshActivityLogs">↻ Refresh Logs</button>
+    </div>
+    <div class="table-wrap">
+        <table style="min-width:720px;">
+            <thead>
+                <tr>
+                    <th>Date &amp; Time</th>
+                    <th>Action</th>
+                    <th>Description</th>
+                    <th>Performed By</th>
+                </tr>
+            </thead>
+            <tbody id="activityLogsTable">
+                <tr><td colspan="4">Activity logs will appear here.</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="status" id="activityLogsMessage" role="status" aria-live="polite"></p>
 </section>
 
 </main>
@@ -794,6 +920,8 @@ accountsTable.addEventListener("click", async event => {
             }
 
             alert(data.message || "Account role updated successfully.");
+            await logActivity("ACCOUNT_ROLE_CHANGED", `${userName} role changed to ${newRole}.`);
+            await loadActivityLogs();
             await loadAccounts();
 
         } catch (error) {
@@ -851,6 +979,8 @@ accountsTable.addEventListener("click", async event => {
             }
 
             alert(data.message || "Account deleted successfully.");
+            await logActivity("ACCOUNT_DELETED", `${userName} account was deleted.`);
+            await loadActivityLogs();
             await loadAccounts();
 
         } catch (error) {
@@ -880,9 +1010,16 @@ function setView(view) {
     currentView = view;
     if (view === "user-management") { window.location.href = "user.html"; return; }
     const overview = view === "overview";
+    const isAdminManagement = view === "admin-management";
+    const isRoleManagement = view === "role-management";
+    const isSystemSettings = view === "system-settings";
+
     quickLinks.style.display = overview ? "grid" : "none";
     statsCards.style.display = overview ? "grid" : "none";
-    managementPanel.style.display = overview ? "none" : "block";
+    managementPanel.style.display =
+        (isAdminManagement || isRoleManagement) ? "block" : "none";
+    document.getElementById("system-settings").style.display =
+        isSystemSettings ? "block" : "none";
     if (view === "admin-management") {
         topbarTitle.textContent = "Admin Management";
         topbarDescription.textContent = "View and manage administrator accounts.";
@@ -895,23 +1032,39 @@ function setView(view) {
         managementTitle.textContent = "Manage Account Roles";
         roleFilter.value = "all"; roleFilter.disabled = true;
         addAdminButton.style.display = "none";
+    } else if (isSystemSettings) {
+        topbarTitle.textContent = "System Settings";
+        topbarDescription.textContent = "Configure JJCC Railways system information.";
     } else {
         topbarTitle.textContent = "Dashboard Overview";
         topbarDescription.textContent = "Welcome to JJCC Railways Administration.";
         roleFilter.value = "all"; roleFilter.disabled = false;
         addAdminButton.style.display = "inline-block";
     }
+
     menuItems.forEach(item => item.classList.remove("active"));
-    const href = view === "admin-management" ? "#admin-management" : view === "role-management" ? "#role-management" : "dashboard-superadmin.html";
+    const href = isAdminManagement ? "#admin-management"
+        : isRoleManagement ? "#role-management"
+        : isSystemSettings ? "#system-settings"
+        : "dashboard-superadmin.html";
     const active = [...menuItems].find(item => item.getAttribute("href") === href);
     if (active) active.classList.add("active");
-    renderAccounts();
+
+    if (isAdminManagement || isRoleManagement || overview) {
+        renderAccounts();
+    }
 }
 function readViewFromHash() {
     const hash = location.hash.toLowerCase();
-    if (hash === "#admin-management" || hash === "#account-management") setView("admin-management");
-    else if (hash === "#role-management") setView("role-management");
-    else setView("overview");
+    if (hash === "#admin-management" || hash === "#account-management") {
+        setView("admin-management");
+    } else if (hash === "#role-management") {
+        setView("role-management");
+    } else if (hash === "#system-settings") {
+        setView("system-settings");
+    } else {
+        setView("overview");
+    }
 }
 window.addEventListener("hashchange", readViewFromHash);
 document.getElementById("searchInput").addEventListener("input", renderAccounts);
@@ -1060,6 +1213,8 @@ createAdminForm.addEventListener("submit", async event => {
         adminFormMessage.className =
             "admin-form-message success";
 
+        await logActivity("ADMIN_INVITED", `Admin invitation sent to ${email} (${fullName}).`);
+        await loadActivityLogs();
         await loadAccounts();
         createAdminForm.reset();
 
@@ -1081,6 +1236,325 @@ createAdminForm.addEventListener("submit", async event => {
 });
 
 
+/* ACTIVITY LOGS */
+
+async function logActivity(action, description) {
+    try {
+        const { data: { session }, error: sessionError } =
+            await supabaseClient.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) return;
+
+        const { error } = await supabaseClient
+            .from("system_activity_logs")
+            .insert({
+                action,
+                description,
+                performed_by: session.user.id
+            });
+
+        if (error) throw error;
+    } catch (error) {
+        // Keep the main action successful even if audit logging fails.
+        console.error("Activity log insert error:", error);
+    }
+}
+
+async function loadActivityLogs() {
+    const tbody = document.getElementById("activityLogsTable");
+    const message = document.getElementById("activityLogsMessage");
+    if (!tbody || !message) return;
+
+    message.textContent = "Loading activity logs...";
+    tbody.replaceChildren();
+
+    try {
+        const { data, error } = await supabaseClient
+            .from("system_activity_logs")
+            .select("id, action, description, performed_by, created_at")
+            .order("created_at", { ascending: false })
+            .limit(100);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = 4;
+            cell.textContent = "No activity logs yet.";
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        } else {
+            data.forEach(log => {
+                const row = document.createElement("tr");
+                const dateCell = document.createElement("td");
+                const actionCell = document.createElement("td");
+                const descriptionCell = document.createElement("td");
+                const actorCell = document.createElement("td");
+
+                dateCell.textContent = log.created_at
+                    ? new Date(log.created_at).toLocaleString()
+                    : "N/A";
+                actionCell.textContent = log.action || "—";
+                descriptionCell.textContent = log.description || "—";
+                actorCell.textContent = log.performed_by || "Unknown";
+
+                row.append(dateCell, actionCell, descriptionCell, actorCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        message.textContent = `Showing ${data?.length || 0} recent activity records (maximum 100).`;
+    } catch (error) {
+        console.error("Load activity logs error:", error);
+        message.textContent = "Unable to load activity logs: " + error.message;
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.textContent = "Could not load activity logs. Check the Supabase INSERT/SELECT policies.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+    }
+}
+
+document.getElementById("refreshActivityLogs")
+    .addEventListener("click", loadActivityLogs);
+
+/* GENERAL SETTINGS */
+
+async function loadGeneralSettings() {
+    const message = document.getElementById("generalSettingsMessage");
+    message.textContent = "Loading general settings...";
+
+    try {
+        const { data, error } = await supabaseClient
+            .from("system_settings")
+            .select("system_name, logo_url, support_email, support_phone, booking_enabled, max_booking_days, cancellation_hours, maintenance_mode, minimum_password_length, max_login_attempts, session_timeout_minutes, require_email_verification")
+            .eq("id", true)
+            .single();
+
+        if (error) throw error;
+
+        document.getElementById("systemName").value = data.system_name || "";
+        document.getElementById("logoUrl").value = data.logo_url || "";
+        document.getElementById("supportEmail").value = data.support_email || "";
+        document.getElementById("supportPhone").value = data.support_phone || "";
+        document.getElementById("maxBookingDays").value = data.max_booking_days ?? 30;
+        document.getElementById("cancellationHours").value = data.cancellation_hours ?? 24;
+        document.getElementById("bookingEnabled").value = String(data.booking_enabled ?? true);
+        document.getElementById("maintenanceMode").value = String(data.maintenance_mode ?? false);
+        document.getElementById("minimumPasswordLength").value = data.minimum_password_length ?? 8;
+        document.getElementById("maxLoginAttempts").value = data.max_login_attempts ?? 5;
+        document.getElementById("sessionTimeoutMinutes").value = data.session_timeout_minutes ?? 60;
+        document.getElementById("requireEmailVerification").value = String(data.require_email_verification ?? true);
+        message.textContent = "General settings loaded.";
+    } catch (error) {
+        console.error("Load general settings error:", error);
+        message.textContent = "Failed to load settings: " + error.message;
+    }
+}
+
+document.getElementById("generalSettingsForm")
+    .addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const button = document.getElementById("saveGeneralSettings");
+        const message = document.getElementById("generalSettingsMessage");
+        button.disabled = true;
+        button.textContent = "SAVING...";
+        message.textContent = "";
+
+        try {
+            const {
+                data: { session },
+                error: sessionError
+            } = await supabaseClient.auth.getSession();
+
+            if (sessionError) throw sessionError;
+            if (!session) throw new Error("Your session expired. Please sign in again.");
+
+            const settings = {
+                system_name: document.getElementById("systemName").value.trim(),
+                logo_url: document.getElementById("logoUrl").value.trim() || null,
+                support_email: document.getElementById("supportEmail").value.trim() || null,
+                support_phone: document.getElementById("supportPhone").value.trim() || null,
+                updated_at: new Date().toISOString(),
+                updated_by: session.user.id
+            };
+
+            if (!settings.system_name) throw new Error("System name is required.");
+
+            const { error } = await supabaseClient
+                .from("system_settings")
+                .update(settings)
+                .eq("id", true);
+
+            if (error) throw error;
+            message.textContent = "General settings saved successfully.";
+            await logActivity("GENERAL_SETTINGS_UPDATED", "General system information was updated.");
+            await loadActivityLogs();
+        } catch (error) {
+            console.error("Save general settings error:", error);
+            message.textContent = "Unable to save settings: " + error.message;
+        } finally {
+            button.disabled = false;
+            button.textContent = "SAVE GENERAL SETTINGS";
+        }
+    });
+
+
+/* RESERVATION SETTINGS */
+
+document.getElementById("reservationSettingsForm")
+    .addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const button = document.getElementById("saveReservationSettings");
+        const message = document.getElementById("reservationSettingsMessage");
+        button.disabled = true;
+        button.textContent = "SAVING...";
+        message.textContent = "";
+
+        try {
+            const { data: { session }, error: sessionError } =
+                await supabaseClient.auth.getSession();
+            if (sessionError) throw sessionError;
+            if (!session) throw new Error("Your session expired. Please sign in again.");
+
+            const maxBookingDays = Number(document.getElementById("maxBookingDays").value);
+            const cancellationHours = Number(document.getElementById("cancellationHours").value);
+            if (!Number.isInteger(maxBookingDays) || maxBookingDays < 1 || maxBookingDays > 365) {
+                throw new Error("Maximum booking days must be between 1 and 365.");
+            }
+            if (!Number.isInteger(cancellationHours) || cancellationHours < 0 || cancellationHours > 720) {
+                throw new Error("Cancellation hours must be between 0 and 720.");
+            }
+
+            const settings = {
+                max_booking_days: maxBookingDays,
+                cancellation_hours: cancellationHours,
+                booking_enabled: document.getElementById("bookingEnabled").value === "true",
+                updated_at: new Date().toISOString(),
+                updated_by: session.user.id
+            };
+
+            const { error } = await supabaseClient
+                .from("system_settings")
+                .update(settings)
+                .eq("id", true);
+            if (error) throw error;
+            message.textContent = "Reservation settings saved successfully.";
+            await logActivity("RESERVATION_SETTINGS_UPDATED", "Booking availability and reservation deadlines were updated.");
+            await loadActivityLogs();
+        } catch (error) {
+            console.error("Save reservation settings error:", error);
+            message.textContent = "Unable to save reservation settings: " + error.message;
+        } finally {
+            button.disabled = false;
+            button.textContent = "SAVE RESERVATION SETTINGS";
+        }
+    });
+
+
+/* MAINTENANCE MODE SETTINGS */
+
+document.getElementById("maintenanceSettingsForm")
+    .addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const button = document.getElementById("saveMaintenanceSettings");
+        const message = document.getElementById("maintenanceSettingsMessage");
+        button.disabled = true;
+        button.textContent = "SAVING...";
+        message.textContent = "";
+
+        try {
+            const { data: { session }, error: sessionError } =
+                await supabaseClient.auth.getSession();
+            if (sessionError) throw sessionError;
+            if (!session) throw new Error("Your session expired. Please sign in again.");
+
+            const maintenanceMode = document.getElementById("maintenanceMode").value === "true";
+            const { error } = await supabaseClient
+                .from("system_settings")
+                .update({
+                    maintenance_mode: maintenanceMode,
+                    updated_at: new Date().toISOString(),
+                    updated_by: session.user.id
+                })
+                .eq("id", true);
+
+            if (error) throw error;
+            message.textContent = maintenanceMode
+                ? "Maintenance mode setting saved as ON. Public pages still need maintenance checks to restrict access."
+                : "Maintenance mode setting saved as OFF.";
+            await logActivity("MAINTENANCE_MODE_CHANGED", `Maintenance mode was turned ${maintenanceMode ? "ON" : "OFF"}.`);
+            await loadActivityLogs();
+        } catch (error) {
+            console.error("Save maintenance settings error:", error);
+            message.textContent = "Unable to save maintenance settings: " + error.message;
+        } finally {
+            button.disabled = false;
+            button.textContent = "SAVE MAINTENANCE SETTINGS";
+        }
+    });
+
+
+/* SECURITY SETTINGS */
+
+document.getElementById("securitySettingsForm")
+    .addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const button = document.getElementById("saveSecuritySettings");
+        const message = document.getElementById("securitySettingsMessage");
+        button.disabled = true;
+        button.textContent = "SAVING...";
+        message.textContent = "";
+
+        try {
+            const { data: { session }, error: sessionError } =
+                await supabaseClient.auth.getSession();
+            if (sessionError) throw sessionError;
+            if (!session) throw new Error("Your session expired. Please sign in again.");
+
+            const minimumPasswordLength = Number(document.getElementById("minimumPasswordLength").value);
+            const maxLoginAttempts = Number(document.getElementById("maxLoginAttempts").value);
+            const sessionTimeoutMinutes = Number(document.getElementById("sessionTimeoutMinutes").value);
+
+            if (!Number.isInteger(minimumPasswordLength) || minimumPasswordLength < 8 || minimumPasswordLength > 64)
+                throw new Error("Minimum password length must be between 8 and 64.");
+            if (!Number.isInteger(maxLoginAttempts) || maxLoginAttempts < 3 || maxLoginAttempts > 10)
+                throw new Error("Maximum login attempts must be between 3 and 10.");
+            if (!Number.isInteger(sessionTimeoutMinutes) || sessionTimeoutMinutes < 5 || sessionTimeoutMinutes > 1440)
+                throw new Error("Session timeout must be between 5 and 1440 minutes.");
+
+            const { error } = await supabaseClient
+                .from("system_settings")
+                .update({
+                    minimum_password_length: minimumPasswordLength,
+                    max_login_attempts: maxLoginAttempts,
+                    session_timeout_minutes: sessionTimeoutMinutes,
+                    require_email_verification: document.getElementById("requireEmailVerification").value === "true",
+                    updated_at: new Date().toISOString(),
+                    updated_by: session.user.id
+                })
+                .eq("id", true);
+
+            if (error) throw error;
+            message.textContent = "Security settings saved successfully. Enforcement must be configured separately in authentication logic.";
+            await logActivity("SECURITY_SETTINGS_UPDATED", "Password, login-attempt, session, and email-verification settings were updated.");
+            await loadActivityLogs();
+        } catch (error) {
+            console.error("Save security settings error:", error);
+            message.textContent = "Unable to save security settings: " + error.message;
+        } finally {
+            button.disabled = false;
+            button.textContent = "SAVE SECURITY SETTINGS";
+        }
+    });
+
+
 /* INITIALIZE DASHBOARD */
 
 async function initializeDashboard() {
@@ -1088,6 +1562,8 @@ async function initializeDashboard() {
 
     if (authorized) {
         await loadAccounts();
+        await loadGeneralSettings();
+        await loadActivityLogs();
         readViewFromHash();
     }
 }
