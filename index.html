@@ -225,7 +225,26 @@ loginForm.addEventListener("submit", async function (event) {
         }
 
 
-        // STEP 4: REDIRECT ACCORDING TO ROLE
+        // STEP 4: CHECK MAINTENANCE MODE FOR NON-SUPER-ADMIN ACCOUNTS
+        // Super Admin must always be able to sign in to manage/disable maintenance.
+        if (profile.role !== "super_admin") {
+            const { data: systemSettings, error: settingsError } =
+                await supabaseClient
+                    .from("public_system_settings")
+                    .select("maintenance_mode")
+                    .single();
+
+            if (settingsError) {
+                console.error("Maintenance settings check failed:", settingsError);
+                throw new Error("Unable to verify system status. Please contact the administrator.");
+            }
+
+            if (systemSettings.maintenance_mode) {
+                throw new Error("JJCC Railways is temporarily under maintenance. Please try again later.");
+            }
+        }
+
+        // STEP 5: REDIRECT ACCORDING TO ROLE
 
         showMessage("Login successful! Redirecting...", true);
 
