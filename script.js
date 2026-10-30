@@ -18,16 +18,15 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginButton = document.getElementById("loginButton");
 const message = document.getElementById("message");
+const togglePassword = document.getElementById("togglePassword");
+const forgotPassword = document.getElementById("forgotPassword");
 
 // 3. SHOW / HIDE PASSWORD
-document.getElementById("togglePassword").addEventListener("click", function () {
-
+togglePassword.addEventListener("click", function () {
     const isPassword = passwordInput.type === "password";
 
     passwordInput.type = isPassword ? "text" : "password";
-
     this.textContent = isPassword ? "Hide" : "Show";
-
 });
 
 // 4. DISPLAY MESSAGE
@@ -38,7 +37,6 @@ function showMessage(text, type) {
 
 // 5. LOGIN FUNCTION
 loginForm.addEventListener("submit", async function (event) {
-
     event.preventDefault();
 
     const email = emailInput.value.trim();
@@ -50,12 +48,12 @@ loginForm.addEventListener("submit", async function (event) {
     showMessage("", "");
 
     try {
-
         // Authenticate through Supabase
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
 
         if (error) throw error;
 
@@ -70,73 +68,68 @@ loginForm.addEventListener("submit", async function (event) {
                 .single();
 
         if (profileError || !profile) {
-
             await supabaseClient.auth.signOut();
 
-            throw new Error("Account profile not found. Contact your administrator.");
-
+            throw new Error(
+                "Account profile not found. Contact your administrator."
+            );
         }
 
-        // Redirect according to assigned role
-        if (profile.role === "user") {
+        // REDIRECT ACCORDING TO ROLE
+        switch (profile.role) {
 
-            window.location.href = "dashboard.html";
+            case "super_admin":
+                window.location.replace("dashboard-superadmin.html");
+                return;
 
-        } else if (profile.role === "admin") {
+            case "admin":
+                window.location.replace("dashboard.html");
+                return;
 
-            window.location.href = "dashboard.html";
+            case "user":
+                window.location.replace("dashboard.html");
+                return;
 
-        } else if (profile.role === "super_admin") {
+            default:
+                await supabaseClient.auth.signOut();
 
-            window.location.href = "dashboard.html";
-
-        } else {
-
-            await supabaseClient.auth.signOut();
-
-            throw new Error("Invalid account role.");
-
+                throw new Error("Invalid account role.");
         }
 
     } catch (error) {
-
         showMessage(error.message, "error");
-
-    } finally {
 
         loginButton.disabled = false;
         loginButton.textContent = "SIGN IN";
-
     }
-
 });
 
 // 6. FORGOT PASSWORD
-document.getElementById("forgotPassword").addEventListener("click", async function (event) {
-
+forgotPassword.addEventListener("click", async function (event) {
     event.preventDefault();
 
     const email = emailInput.value.trim();
 
     if (!email) {
-
-        showMessage("Please enter your email address first.", "error");
+        showMessage(
+            "Please enter your email address first.",
+            "error"
+        );
         return;
-
     }
 
     try {
-
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+        const { error } =
+            await supabaseClient.auth.resetPasswordForEmail(email);
 
         if (error) throw error;
 
-        showMessage("Password reset instructions have been sent to your email.", "success");
+        showMessage(
+            "Password reset instructions have been sent to your email.",
+            "success"
+        );
 
     } catch (error) {
-
         showMessage(error.message, "error");
-
     }
-
 });
