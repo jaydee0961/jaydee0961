@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Management | JJCC Railways</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+    --navy: #102044;
+    --gold: #d18408;
+    --cream: #f5f3ee;
+    --ink: #172440;
+    --muted: #77766f;
+    --line: #e5e3de;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: var(--cream);
+    color: var(--ink);
+}
+
+header {
+    background: var(--navy);
+    color: white;
+    padding: 22px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand {
+    font-weight: bold;
+    font-size: 21px;
+}
+
+.brand span {
+    color: var(--gold);
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    max-width: 1200px;
+    margin: 38px auto;
+    padding: 0 22px;
+}
+
+.heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+h1 {
+    font-size: 27px;
+    margin-bottom: 7px;
+}
+
+.muted {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.back {
+    background: var(--navy);
+    color: white;
+    text-decoration: none;
+    padding: 12px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+.stats {
+    display: flex;
+    gap: 16px;
+    margin: 25px 0;
+}
+
+.stat, .panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.stat {
+    min-width: 210px;
+}
+
+.stat p {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.stat h2 {
+    font-size: 30px;
+    margin-top: 9px;
+    color: var(--navy);
+}
+
+.panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+input {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    min-width: 220px;
+    max-width: 100%;
+    font-size: 14px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th, td {
+    text-align: left;
+    padding: 15px 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+}
+
+th {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.role {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #e8f1fc;
+    color: #2463a5;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+#status {
+    margin: 14px 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media(max-width:600px) {
+    .stats {
+        flex-direction: column;
+    }
+
+    .stat {
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 23px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        JJCC <span>RAILWAYS</span>
+    </div>
+
+    <a href="dashboard-superadmin.html">
+        ← Back to Dashboard
+    </a>
+</header>
+
+<main>
+
+    <div class="heading">
+        <div>
+            <h1>User Management</h1>
+            <p class="muted">
+                View and search registered passenger profiles.
+            </p>
+        </div>
+
+        <a class="back" href="dashboard-superadmin.html">
+            Dashboard Overview
+        </a>
+    </div>
+
+    <section class="stats">
+        <div class="stat">
+            <p>Total Passenger Profiles</p>
+            <h2 id="totalUsers">—</h2>
+        </div>
+    </section>
+
+    <section class="panel">
+
+        <div class="panel-head">
+            <h2>Registered Users</h2>
+
+            <input
+                id="searchInput"
+                type="search"
+                placeholder="Search name or user ID..."
+                aria-label="Search users"
+            >
+        </div>
+
+        <p id="status" role="status">
+            Checking Super Admin access...
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>User ID</th>
+                        <th>Role</th>
+                        <th>Date Created</th>
+                    </tr>
+                </thead>
+
+                <tbody id="usersTable">
+                    <tr>
+                        <td colspan="4">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+
+const SUPABASE_URL =
+    "https://ckykcejjmrcjcaiorikd.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_Tv7ZwN3fd9miokDU9CHcVA_MW5N4bKP";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+const statusEl = document.getElementById("status");
+const tableBody = document.getElementById("usersTable");
+
+let users = [];
+
+function showUsers(rows) {
+
+    tableBody.replaceChildren();
+
+    if (!rows.length) {
+
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+
+        td.colSpan = 4;
+        td.textContent = "No passenger profiles found.";
+
+        tr.appendChild(td);
+        tableBody.appendChild(tr);
+
+        return;
+    }
+
+    rows.forEach(user => {
+
+        const tr = document.createElement("tr");
+
+        const name = document.createElement("td");
+        const id = document.createElement("td");
+        const roleCell = document.createElement("td");
+        const date = document.createElement("td");
+
+        const badge = document.createElement("span");
+
+        name.textContent = user.full_name || "Unnamed";
+        id.textContent = user.id;
+
+        badge.className = "role";
+        badge.textContent =
+            (user.role || "user").toUpperCase();
+
+        roleCell.appendChild(badge);
+
+        date.textContent = user.created_at
+            ? new Date(user.created_at).toLocaleDateString()
+            : "N/A";
+
+        tr.append(name, id, roleCell, date);
+
+        tableBody.appendChild(tr);
+    });
+}
+
+async function initializeUsers() {
+
+    try {
+
+        // CHECK SESSION
+        const {
+            data: { session },
+            error: sessionError
+        } = await supabaseClient.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        if (!session) {
+            window.location.replace("index.html");
+            return;
+        }
+
+        // VERIFY SUPER ADMIN
+        const {
+            data: profile,
+            error: profileError
+        } = await supabaseClient
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
+
+        if (profileError) throw profileError;
+
+        if (profile.role !== "super_admin") {
+
+            statusEl.textContent =
+                "Access denied. Super Admin only.";
+
+            return;
+        }
+
+        // LOAD PASSENGER PROFILES
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("profiles")
+            .select("id, full_name, role, created_at")
+            .eq("role", "user")
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) throw error;
+
+        users = data || [];
+
+        document.getElementById("totalUsers").textContent =
+            users.length;
+
+        showUsers(users);
+
+        statusEl.textContent =
+            "Passenger profiles loaded successfully.";
+
+    } catch (error) {
+
+        console.error("User Management Error:", error);
+
+        statusEl.textContent =
+            "Could not load users: " +
+            (error.message || "Unknown error") +
+            ". Check the profiles table SELECT policy for Super Admin.";
+
+        tableBody.replaceChildren();
+    }
+}
+
+// SEARCH USERS
+document.getElementById("searchInput")
+    .addEventListener("input", event => {
+
+        const query =
+            event.target.value.trim().toLowerCase();
+
+        const filtered = users.filter(user =>
+
+            (user.full_name || "")
+                .toLowerCase()
+                .includes(query) ||
+
+            (user.id || "")
+                .toLowerCase()
+                .includes(query)
+        );
+
+        showUsers(filtered);
+    });
+
+// INITIALIZE
+initializeUsers();
+
+</script>
+
+</body>
+</html>

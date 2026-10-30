@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JJCC Railways | Super Admin</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -29,6 +29,7 @@ body {
     color: var(--ink);
 }
 
+/* SIDEBAR */
 .sidebar {
     position: fixed;
     width: 250px;
@@ -46,7 +47,9 @@ body {
     margin-bottom: 8px;
 }
 
-.brand span { color: var(--gold); }
+.brand span {
+    color: var(--gold);
+}
 
 .subtitle {
     color: #b9c4d7;
@@ -62,13 +65,16 @@ body {
 }
 
 .menu-item {
+    display: block;
     padding: 14px 12px;
     border-radius: 7px;
     color: #dce4f1;
     margin-bottom: 7px;
+    text-decoration: none;
     cursor: pointer;
 }
 
+.menu-item:hover,
 .menu-item.active {
     background: #263d64;
     color: white;
@@ -84,6 +90,7 @@ body {
     cursor: pointer;
 }
 
+/* MAIN */
 .main {
     margin-left: 250px;
     padding: 35px;
@@ -94,10 +101,12 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    margin-bottom: 35px;
+    margin-bottom: 28px;
 }
 
-.topbar h1 { font-size: 27px; }
+.topbar h1 {
+    font-size: 27px;
+}
 
 .topbar p {
     color: var(--muted);
@@ -114,6 +123,51 @@ body {
     font-weight: bold;
 }
 
+/* MANAGEMENT BOXES */
+.quick-links {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.quick-link {
+    display: block;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: .2s;
+}
+
+.quick-link:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px #10204414;
+}
+
+.quick-link h3 {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.quick-link p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.link-note {
+    display: block;
+    margin-top: 12px;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* DASHBOARD CARDS */
 .cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -121,11 +175,12 @@ body {
     margin-bottom: 30px;
 }
 
-.card {
+.card,
+.panel {
     background: white;
-    padding: 24px;
     border: 1px solid var(--line);
     border-radius: 12px;
+    padding: 24px;
 }
 
 .card p {
@@ -138,15 +193,11 @@ body {
     margin: 14px 0 5px;
 }
 
-.card small { color: var(--muted); }
-
-.panel {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 25px;
+.card small {
+    color: var(--muted);
 }
 
+/* ACCOUNT MANAGEMENT */
 .panel-header {
     display: flex;
     justify-content: space-between;
@@ -156,7 +207,9 @@ body {
     flex-wrap: wrap;
 }
 
-.panel-header h2 { font-size: 19px; }
+.panel-header h2 {
+    font-size: 19px;
+}
 
 .filters {
     display: flex;
@@ -164,7 +217,8 @@ body {
     flex-wrap: wrap;
 }
 
-input, select {
+input,
+select {
     padding: 11px 13px;
     border: 1px solid var(--line);
     border-radius: 7px;
@@ -172,9 +226,13 @@ input, select {
     color: var(--ink);
 }
 
-input { min-width: 200px; }
+input {
+    min-width: 200px;
+}
 
-button { cursor: pointer; }
+button {
+    cursor: pointer;
+}
 
 .refresh-btn {
     background: var(--navy);
@@ -193,9 +251,13 @@ button { cursor: pointer; }
     font-weight: bold;
 }
 
-.add-admin-btn:hover { background: #ad6b05; }
+.add-admin-btn:hover {
+    background: #ad6b05;
+}
 
-.table-wrap { overflow-x: auto; }
+.table-wrap {
+    overflow-x: auto;
+}
 
 table {
     width: 100%;
@@ -203,7 +265,8 @@ table {
     min-width: 550px;
 }
 
-th, td {
+th,
+td {
     text-align: left;
     padding: 16px 12px;
     border-bottom: 1px solid var(--line);
@@ -257,19 +320,20 @@ th {
 }
 
 /* ADMIN MODAL */
-
 .admin-modal {
     display: none;
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: rgba(10, 25, 50, .65);
+    background: #0a1932a6;
     align-items: center;
     justify-content: center;
     padding: 20px;
 }
 
-.admin-modal.show { display: flex; }
+.admin-modal.show {
+    display: flex;
+}
 
 .admin-modal-content {
     width: 100%;
@@ -277,7 +341,7 @@ th {
     background: white;
     padding: 28px;
     border-radius: 12px;
-    box-shadow: 0 15px 50px rgba(0,0,0,.2);
+    box-shadow: 0 15px 50px #0003;
 }
 
 .admin-modal-content h2 {
@@ -291,7 +355,9 @@ th {
     margin-bottom: 22px;
 }
 
-.admin-form-group { margin-bottom: 16px; }
+.admin-form-group {
+    margin-bottom: 16px;
+}
 
 .admin-form-group label {
     display: block;
@@ -349,37 +415,81 @@ th {
     line-height: 1.5;
 }
 
-.admin-form-message.error { color: #dc2626; }
-.admin-form-message.success { color: #15803d; }
+.admin-form-message.error {
+    color: #dc2626;
+}
 
-@media(max-width: 850px) {
-    .sidebar { width: 190px; }
+.admin-form-message.success {
+    color: #15803d;
+}
+
+.settings-note {
+    margin-top: 22px;
+}
+
+.settings-note p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+/* RESPONSIVE */
+@media(max-width:1100px) {
+    .quick-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media(max-width:850px) {
+    .sidebar {
+        width: 190px;
+    }
+
     .main {
         margin-left: 190px;
         padding: 20px;
     }
-    .cards { grid-template-columns: 1fr; }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
 }
 
-@media(max-width: 600px) {
+@media(max-width:600px) {
     .sidebar {
         position: static;
         width: 100%;
         height: auto;
     }
-    .subtitle { margin-bottom: 15px; }
-    .logout { margin-top: 15px; }
+
+    .subtitle {
+        margin-bottom: 15px;
+    }
+
+    .logout {
+        margin-top: 15px;
+    }
+
     .main {
         margin-left: 0;
         padding: 18px;
     }
-    .topbar h1 { font-size: 22px; }
+
+    .topbar h1 {
+        font-size: 22px;
+    }
+
+    .quick-links {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<!-- SIDEBAR -->
 <aside class="sidebar">
 
     <div class="brand">🚆 JJCC <span>RAILWAYS</span></div>
@@ -387,10 +497,25 @@ th {
 
     <p class="menu-title">MAIN MENU</p>
 
-    <div class="menu-item active">▦ Dashboard Overview</div>
-    <div class="menu-item">♙ User Management</div>
-    <div class="menu-item">♜ Admin Management</div>
-    <div class="menu-item">⚙ System Settings</div>
+    <a class="menu-item active" href="dashboard-superadmin.html">
+        ▦ Dashboard Overview
+    </a>
+
+    <a class="menu-item" href="user.html">
+        ♙ User Management
+    </a>
+
+    <a class="menu-item" href="#account-management">
+        ♜ Admin Management
+    </a>
+
+    <a class="menu-item" href="#role-management">
+        ♙ Role Management
+    </a>
+
+    <a class="menu-item" href="#system-settings">
+        ⚙ System Settings
+    </a>
 
     <button class="logout" id="logoutButton">
         ↪ Sign Out
@@ -398,114 +523,156 @@ th {
 
 </aside>
 
+<!-- MAIN CONTENT -->
 <main class="main">
 
-    <header class="topbar">
-        <div>
-            <h1>Dashboard Overview</h1>
-            <p>Welcome to JJCC Railways Administration.</p>
+<header class="topbar">
+    <div>
+        <h1>Dashboard Overview</h1>
+        <p>Welcome to JJCC Railways Administration.</p>
+    </div>
+
+    <span class="admin-badge">♛ SUPER ADMIN</span>
+</header>
+
+<!-- MANAGEMENT BOXES -->
+<section class="quick-links">
+
+    <a class="quick-link" href="user.html">
+        <h3>User Management</h3>
+        <p>View and search registered passenger profiles.</p>
+        <span class="link-note">OPEN USER MANAGEMENT →</span>
+    </a>
+
+    <a class="quick-link" href="#account-management">
+        <h3>Admin Management</h3>
+        <p>View administrator accounts and send new invitations.</p>
+        <span class="link-note">MANAGE ADMINS →</span>
+    </a>
+
+    <a class="quick-link" href="#role-management">
+        <h3>Role Management</h3>
+        <p>Filter accounts by User, Admin, and Super Admin roles.</p>
+        <span class="link-note">MANAGE ROLES →</span>
+    </a>
+
+    <a class="quick-link" href="#system-settings">
+        <h3>System Settings</h3>
+        <p>View the system settings section.</p>
+        <span class="link-note">VIEW SETTINGS →</span>
+    </a>
+
+</section>
+
+<!-- STATISTICS -->
+<section class="cards">
+
+    <div class="card">
+        <p>Total Registered Accounts</p>
+        <h2 id="totalUsers">0</h2>
+        <small>All profiles</small>
+    </div>
+
+    <div class="card">
+        <p>Passenger Accounts</p>
+        <h2 id="totalPassengers">0</h2>
+        <small>Regular users</small>
+    </div>
+
+    <div class="card">
+        <p>Admin Accounts</p>
+        <h2 id="totalAdmins">0</h2>
+        <small>System administrators</small>
+    </div>
+
+</section>
+
+<!-- ACCOUNT MANAGEMENT -->
+<section class="panel" id="account-management">
+
+    <div class="panel-header">
+
+        <h2>Account Management</h2>
+
+        <div class="filters">
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Search full name..."
+            >
+
+            <select id="roleFilter">
+                <option value="all">All Roles</option>
+                <option value="user">Users</option>
+                <option value="admin">Admins</option>
+                <option value="super_admin">Super Admins</option>
+            </select>
+
+            <span id="role-management"></span>
+
+            <button class="refresh-btn" id="refreshButton">
+                ↻ Refresh
+            </button>
+
+            <button class="add-admin-btn" id="openAdminModal">
+                + ADD NEW ADMIN
+            </button>
+
         </div>
 
-        <span class="admin-badge">♛ SUPER ADMIN</span>
-    </header>
+    </div>
 
-    <section class="cards">
+    <div class="table-wrap">
 
-        <div class="card">
-            <p>Total Registered Accounts</p>
-            <h2 id="totalUsers">0</h2>
-            <small>All profiles</small>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Role</th>
+                    <th>Date Created</th>
+                </tr>
+            </thead>
 
-        <div class="card">
-            <p>Passenger Accounts</p>
-            <h2 id="totalPassengers">0</h2>
-            <small>Regular users</small>
-        </div>
+            <tbody id="accountsTable">
+                <tr>
+                    <td colspan="3">Loading accounts...</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div class="card">
-            <p>Admin Accounts</p>
-            <h2 id="totalAdmins">0</h2>
-            <small>System administrators</small>
-        </div>
+    </div>
 
-    </section>
+    <p class="status" id="statusMessage">
+        Connecting to Supabase...
+    </p>
 
-    <section class="panel">
+    <div class="notice">
+        <strong>Security Notice:</strong>
+        Only authorized Super Admin accounts can manage administrators.
+    </div>
 
-        <div class="panel-header">
+</section>
 
-            <h2>Account Management</h2>
-
-            <div class="filters">
-
-                <input
-                    type="search"
-                    id="searchInput"
-                    placeholder="Search full name..."
-                >
-
-                <select id="roleFilter">
-                    <option value="all">All Roles</option>
-                    <option value="user">Users</option>
-                    <option value="admin">Admins</option>
-                    <option value="super_admin">Super Admins</option>
-                </select>
-
-                <button class="refresh-btn" id="refreshButton">
-                    ↻ Refresh
-                </button>
-
-                <button class="add-admin-btn" id="openAdminModal">
-                    + ADD NEW ADMIN
-                </button>
-
-            </div>
-
-        </div>
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Full Name</th>
-                        <th>Role</th>
-                        <th>Date Created</th>
-                    </tr>
-                </thead>
-
-                <tbody id="accountsTable">
-                    <tr>
-                        <td colspan="3">Loading accounts...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <p class="status" id="statusMessage">
-            Connecting to Supabase...
-        </p>
-
-        <div class="notice">
-            <strong>Security Notice:</strong>
-            Only authorized Super Admin accounts can manage administrators.
-        </div>
-
-    </section>
+<!-- SYSTEM SETTINGS -->
+<section class="panel settings-note" id="system-settings">
+    <h2>System Settings</h2>
+    <p>
+        System settings controls are not connected yet.
+        This section is reserved for the next development step.
+    </p>
+</section>
 
 </main>
 
 <!-- ADD ADMIN MODAL -->
-
 <div class="admin-modal" id="adminModal">
 
     <div class="admin-modal-content">
 
         <h2>Create New Admin</h2>
 
-        <p>
-            Register a new administrator for JJCC Railways.
-        </p>
+        <p>Register a new administrator for JJCC Railways.</p>
 
         <form id="createAdminForm">
 
@@ -534,7 +701,8 @@ th {
             <div class="admin-form-group">
                 <label>Invitation</label>
                 <div class="admin-role">
-                    An invitation email will be sent. The new admin will set their own password.
+                    An invitation email will be sent.
+                    The new admin will set their own password.
                 </div>
             </div>
 
@@ -575,9 +743,8 @@ th {
 </div>
 
 <script>
-/* =====================================
-   SUPABASE CONFIGURATION
-===================================== */
+
+/* SUPABASE CONFIGURATION */
 
 const SUPABASE_URL =
     "https://ckykcejjmrcjcaiorikd.supabase.co";
@@ -598,9 +765,8 @@ const statusMessage =
 
 let accounts = [];
 
-/* =====================================
-   VERIFY SUPER ADMIN
-===================================== */
+
+/* VERIFY SUPER ADMIN */
 
 async function verifySuperAdmin() {
 
@@ -651,9 +817,8 @@ async function verifySuperAdmin() {
     }
 }
 
-/* =====================================
-   LOAD ACCOUNTS
-===================================== */
+
+/* LOAD ACCOUNTS */
 
 async function loadAccounts() {
 
@@ -693,9 +858,8 @@ async function loadAccounts() {
     }
 }
 
-/* =====================================
-   DISPLAY ACCOUNTS
-===================================== */
+
+/* DISPLAY ACCOUNTS */
 
 function renderAccounts() {
 
@@ -710,8 +874,8 @@ function renderAccounts() {
 
         const matchesName =
             (account.full_name || "")
-            .toLowerCase()
-            .includes(search);
+                .toLowerCase()
+                .includes(search);
 
         const matchesRole =
             filter === "all" || account.role === filter;
@@ -719,15 +883,18 @@ function renderAccounts() {
         return matchesName && matchesRole;
     });
 
-    accountsTable.innerHTML = "";
+    accountsTable.replaceChildren();
 
     if (filtered.length === 0) {
 
-        accountsTable.innerHTML = `
-            <tr>
-                <td colspan="3">No accounts found.</td>
-            </tr>
-        `;
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 3;
+        cell.textContent = "No accounts found.";
+
+        row.appendChild(cell);
+        accountsTable.appendChild(row);
 
         return;
     }
@@ -760,9 +927,8 @@ function renderAccounts() {
     });
 }
 
-/* =====================================
-   SEARCH AND FILTER
-===================================== */
+
+/* SEARCH AND FILTER */
 
 document.getElementById("searchInput")
     .addEventListener("input", renderAccounts);
@@ -773,9 +939,8 @@ document.getElementById("roleFilter")
 document.getElementById("refreshButton")
     .addEventListener("click", loadAccounts);
 
-/* =====================================
-   LOGOUT
-===================================== */
+
+/* LOGOUT */
 
 document.getElementById("logoutButton")
     .addEventListener("click", async () => {
@@ -791,9 +956,8 @@ document.getElementById("logoutButton")
         window.location.replace("index.html");
     });
 
-/* =====================================
-   ADMIN MODAL
-===================================== */
+
+/* ADMIN MODAL */
 
 const adminModal =
     document.getElementById("adminModal");
@@ -807,6 +971,7 @@ const createAdminButton =
 const adminFormMessage =
     document.getElementById("adminFormMessage");
 
+
 document.getElementById("openAdminModal")
     .addEventListener("click", () => {
 
@@ -815,6 +980,7 @@ document.getElementById("openAdminModal")
 
         adminModal.classList.add("show");
     });
+
 
 function closeAdminDialog() {
 
@@ -826,8 +992,10 @@ function closeAdminDialog() {
     adminFormMessage.className = "admin-form-message";
 }
 
+
 document.getElementById("closeAdminModal")
     .addEventListener("click", closeAdminDialog);
+
 
 adminModal.addEventListener("click", event => {
 
@@ -836,9 +1004,8 @@ adminModal.addEventListener("click", event => {
     }
 });
 
-/* =====================================
-   CREATE ADMIN VIA EDGE FUNCTION
-===================================== */
+
+/* CREATE ADMIN VIA EDGE FUNCTION */
 
 createAdminForm.addEventListener("submit", async event => {
 
@@ -846,11 +1013,11 @@ createAdminForm.addEventListener("submit", async event => {
 
     const fullName =
         document.getElementById("adminFullName")
-        .value.trim();
+            .value.trim();
 
     const email =
         document.getElementById("adminEmail")
-        .value.trim().toLowerCase();
+            .value.trim().toLowerCase();
 
     if (!fullName || !email) {
 
@@ -894,7 +1061,39 @@ createAdminForm.addEventListener("submit", async event => {
                 }
             );
 
-        if (error) throw error;
+        if (error) {
+
+            let message =
+                error.message || "Admin invitation failed.";
+
+            try {
+
+                const response = error.context;
+
+                if (
+                    response &&
+                    typeof response.clone === "function"
+                ) {
+
+                    const details =
+                        await response.clone().json();
+
+                    message =
+                        details.error ||
+                        details.message ||
+                        message;
+                }
+
+            } catch (parseError) {
+
+                console.error(
+                    "Could not read Edge Function error body:",
+                    parseError
+                );
+            }
+
+            throw new Error(message);
+        }
 
         if (!data || data.success !== true) {
             throw new Error(
@@ -931,9 +1130,8 @@ createAdminForm.addEventListener("submit", async event => {
     }
 });
 
-/* =====================================
-   INITIALIZE DASHBOARD
-===================================== */
+
+/* INITIALIZE DASHBOARD */
 
 async function initializeDashboard() {
 

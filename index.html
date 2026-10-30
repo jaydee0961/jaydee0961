@@ -38,15 +38,23 @@
 
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email"
-                        placeholder="Enter your email" required>
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    >
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-box">
-                        <input type="password" id="password"
-                            placeholder="Enter your password" required>
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            required
+                        >
                         <button type="button" id="togglePassword">Show</button>
                     </div>
                 </div>
@@ -56,10 +64,15 @@
                         <input type="checkbox" id="remember">
                         Remember me
                     </label>
+
                     <a href="#" id="forgotPassword">Forgot Password?</a>
                 </div>
 
-                <button type="submit" id="loginButton" class="login-button">
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
                     SIGN IN
                 </button>
 
@@ -84,170 +97,213 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // CORRECT SUPABASE CONFIGURATION
 
-    const SUPABASE_URL =
-        "https://ckykcejjmrcjcaiorikd.supabase.co";
+// =====================================
+// JJCC RAILWAYS - LOGIN SYSTEM
+// =====================================
 
-    const SUPABASE_ANON_KEY =
-        "sb_publishable_Tv7ZwN3fd9miokDU9CHcVA_MW5N4bKP";
+// 1. SUPABASE CONFIGURATION
 
-    const supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
+const SUPABASE_URL =
+    "https://ckykcejjmrcjcaiorikd.supabase.co";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_Tv7ZwN3fd9miokDU9CHcVA_MW5N4bKP";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
         }
-    );
-
-    // ELEMENTS
-
-    const loginForm = document.getElementById("loginForm");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const loginButton = document.getElementById("loginButton");
-    const message = document.getElementById("message");
-
-    function showMessage(text, success = false) {
-        message.textContent = text;
-        message.style.color = success ? "green" : "#dc2626";
     }
+);
 
-    // SHOW / HIDE PASSWORD
 
-    document.getElementById("togglePassword")
-        .addEventListener("click", function () {
+// 2. GET HTML ELEMENTS
 
-            const isPassword = passwordInput.type === "password";
+const loginForm = document.getElementById("loginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginButton = document.getElementById("loginButton");
+const message = document.getElementById("message");
+const togglePassword = document.getElementById("togglePassword");
+const forgotPassword = document.getElementById("forgotPassword");
 
-            passwordInput.type = isPassword ? "text" : "password";
-            this.textContent = isPassword ? "Hide" : "Show";
-        });
 
-    // LOGIN
+// 3. DISPLAY MESSAGE
 
-    loginForm.addEventListener("submit", async function (event) {
+function showMessage(text, success = false) {
+    message.textContent = text;
+    message.style.color = success ? "green" : "#dc2626";
+}
 
-        event.preventDefault();
 
-        const email = emailInput.value.trim().toLowerCase();
-        const password = passwordInput.value;
+// 4. SHOW / HIDE PASSWORD
 
-        loginButton.disabled = true;
-        loginButton.textContent = "SIGNING IN...";
-        showMessage("");
+togglePassword.addEventListener("click", function () {
 
-        let authenticated = false;
+    const isPassword = passwordInput.type === "password";
 
-        try {
+    passwordInput.type = isPassword ? "text" : "password";
 
-            // STEP 1: SIGN IN
+    this.textContent = isPassword ? "Hide" : "Show";
 
-            const { data: authData, error: authError } =
-                await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
+});
 
-            if (authError) throw authError;
 
-            if (!authData.user) {
-                throw new Error("Unable to retrieve your account.");
-            }
+// 5. LOGIN FUNCTION
 
-            authenticated = true;
+loginForm.addEventListener("submit", async function (event) {
 
-            // STEP 2: GET PROFILE
+    event.preventDefault();
 
-            const { data: profile, error: profileError } =
-                await supabaseClient
-                    .from("profiles")
-                    .select("id, full_name, role")
-                    .eq("id", authData.user.id)
-                    .maybeSingle();
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
 
-            if (profileError) {
-                throw new Error(
-                    "Profile loading failed: " + profileError.message
-                );
-            }
+    loginButton.disabled = true;
+    loginButton.textContent = "SIGNING IN...";
 
-            if (!profile) {
-                throw new Error(
-                    "Your profile was not found. Contact your administrator."
-                );
-            }
+    showMessage("");
 
-            // STEP 3: VALIDATE ROLE
+    let authenticated = false;
 
-            const allowedRoles = ["user", "admin", "super_admin"];
+    try {
 
-            if (!allowedRoles.includes(profile.role)) {
-                throw new Error("Invalid account role.");
-            }
+        // STEP 1: AUTHENTICATE USER
 
-            // STEP 4: REDIRECT
+        const { data: authData, error: authError } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
 
-            showMessage("Login successful! Redirecting...", true);
+        if (authError) throw authError;
+
+        if (!authData.user) {
+            throw new Error("Unable to retrieve your account.");
+        }
+
+        authenticated = true;
+
+
+        // STEP 2: GET USER PROFILE
+
+        const { data: profile, error: profileError } =
+            await supabaseClient
+                .from("profiles")
+                .select("id, full_name, role")
+                .eq("id", authData.user.id)
+                .maybeSingle();
+
+        if (profileError) {
+            throw new Error(
+                "Profile loading failed: " + profileError.message
+            );
+        }
+
+        if (!profile) {
+            throw new Error(
+                "Your profile was not found. Contact your administrator."
+            );
+        }
+
+
+        // STEP 3: VALIDATE ROLE
+
+        const allowedRoles = [
+            "user",
+            "admin",
+            "super_admin"
+        ];
+
+        if (!allowedRoles.includes(profile.role)) {
+            throw new Error("Invalid account role.");
+        }
+
+
+        // STEP 4: REDIRECT ACCORDING TO ROLE
+
+        showMessage("Login successful! Redirecting...", true);
+
+        if (profile.role === "super_admin") {
+
+            window.location.replace("dashboard-superadmin.html");
+
+        } else if (profile.role === "admin") {
 
             window.location.replace("dashboard.html");
 
-        } catch (error) {
+        } else if (profile.role === "user") {
 
-            console.error("LOGIN ERROR:", error);
+            window.location.replace("dashboard.html");
 
-            showMessage(error.message || "Login failed.");
-
-            if (authenticated) {
-                await supabaseClient.auth.signOut();
-            }
-
-            loginButton.disabled = false;
-            loginButton.textContent = "SIGN IN";
         }
-    });
 
-    // FORGOT PASSWORD
+    } catch (error) {
 
-    document.getElementById("forgotPassword")
-        .addEventListener("click", async function (event) {
+        console.error("LOGIN ERROR:", error);
 
-            event.preventDefault();
+        showMessage(error.message || "Login failed.");
 
-            const email = emailInput.value.trim().toLowerCase();
+        if (authenticated) {
+            await supabaseClient.auth.signOut();
+        }
 
-            if (!email) {
-                showMessage("Enter your email address first.");
-                emailInput.focus();
-                return;
-            }
+        loginButton.disabled = false;
+        loginButton.textContent = "SIGN IN";
 
-            try {
+    }
 
-                const { error } =
-                    await supabaseClient.auth.resetPasswordForEmail(
-                        email,
-                        {
-                            redirectTo:
-                                window.location.origin + "/reset-password.html"
-                        }
-                    );
+});
 
-                if (error) throw error;
 
-                showMessage(
-                    "Password recovery email sent. Check your inbox.",
-                    true
-                );
+// 6. FORGOT PASSWORD
 
-            } catch (error) {
-                showMessage(error.message);
-            }
-        });
+forgotPassword.addEventListener("click", async function (event) {
+
+    event.preventDefault();
+
+    const email = emailInput.value.trim().toLowerCase();
+
+    if (!email) {
+
+        showMessage("Enter your email address first.");
+
+        emailInput.focus();
+
+        return;
+
+    }
+
+    try {
+
+        const { error } =
+            await supabaseClient.auth.resetPasswordForEmail(
+                email,
+                {
+                    redirectTo:
+                        window.location.origin + "/reset-password.html"
+                }
+            );
+
+        if (error) throw error;
+
+        showMessage(
+            "Password recovery email sent. Check your inbox.",
+            true
+        );
+
+    } catch (error) {
+
+        showMessage(error.message);
+
+    }
+
+});
 
 </script>
 
