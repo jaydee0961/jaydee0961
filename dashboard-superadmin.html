@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -348,7 +347,7 @@ th {
 
     <a class="menu-item active" href="dashboard-superadmin.html">▦ Dashboard Overview</a>
     <a class="menu-item" href="user.html">♙ User Management</a>
-    <a class="menu-item" href="#account-management">♜ Admin Management</a>
+    <a class="menu-item" href="#admin-management">♜ Admin Management</a>
     <a class="menu-item" href="#role-management">♙ Role Management</a>
     <a class="menu-item" href="#system-settings">⚙ System Settings</a>
 
@@ -374,7 +373,7 @@ th {
         <span class="link-note">OPEN USER MANAGEMENT →</span>
     </a>
 
-    <a class="quick-link" href="#account-management">
+    <a class="quick-link" href="#admin-management">
         <h3>Admin Management</h3>
         <p>View administrator accounts and send new invitations.</p>
         <span class="link-note">MANAGE ADMINS →</span>
@@ -417,7 +416,7 @@ th {
 <!-- ACCOUNT MANAGEMENT -->
 <section class="panel" id="account-management">
     <div class="panel-header">
-        <h2>Account Management</h2>
+        <h2 id="managementTitle">Account Management</h2>
 
         <div class="filters">
             <input type="search" id="searchInput" placeholder="Search full name...">
@@ -429,7 +428,7 @@ th {
                 <option value="super_admin">Super Admins</option>
             </select>
 
-            <span id="role-management"></span>
+            
 
             <button class="refresh-btn" id="refreshButton">↻ Refresh</button>
             <button class="add-admin-btn" id="openAdminModal">+ ADD NEW ADMIN</button>
@@ -631,9 +630,14 @@ function renderAccounts() {
         const matchesName =
             (account.full_name || "").toLowerCase().includes(search);
 
-        const matchesRole =
-            filter === "all" || account.role === filter;
-
+        let matchesRole = true;
+        if (currentView === "admin-management") {
+            matchesRole = account.role === "admin";
+        } else if (currentView === "role-management") {
+            matchesRole = account.role === "user" || account.role === "admin";
+        } else {
+            matchesRole = filter === "all" || account.role === filter;
+        }
         return matchesName && matchesRole;
     });
 
@@ -677,34 +681,42 @@ function renderAccounts() {
             protectedLabel.className = "protected-label";
             protectedLabel.textContent = "PROTECTED";
             actionsCell.appendChild(protectedLabel);
-
         } else {
             const actionGroup = document.createElement("div");
             actionGroup.className = "action-buttons";
-
-            const roleButton = document.createElement("button");
-            roleButton.type = "button";
-            roleButton.className = "role-action-btn";
-
-            roleButton.textContent =
-                account.role === "user" ? "PROMOTE" : "DEMOTE";
-
-            roleButton.dataset.userId = account.id;
-            roleButton.dataset.userName =
-                account.full_name || "this account";
-
-            roleButton.dataset.newRole =
-                account.role === "user" ? "admin" : "user";
-
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.className = "delete-account-btn";
-            deleteButton.textContent = "DELETE";
-            deleteButton.dataset.userId = account.id;
-            deleteButton.dataset.userName =
-                account.full_name || "this account";
-
-            actionGroup.append(roleButton, deleteButton);
+            if (currentView === "role-management") {
+                const roleButton = document.createElement("button");
+                roleButton.type = "button";
+                roleButton.className = "role-action-btn";
+                roleButton.textContent = account.role === "user" ? "PROMOTE" : "DEMOTE";
+                roleButton.dataset.userId = account.id;
+                roleButton.dataset.userName = account.full_name || "this account";
+                roleButton.dataset.newRole = account.role === "user" ? "admin" : "user";
+                actionGroup.appendChild(roleButton);
+            } else if (currentView === "admin-management") {
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "delete-account-btn";
+                deleteButton.textContent = "DELETE";
+                deleteButton.dataset.userId = account.id;
+                deleteButton.dataset.userName = account.full_name || "this account";
+                actionGroup.appendChild(deleteButton);
+            } else {
+                const roleButton = document.createElement("button");
+                roleButton.type = "button";
+                roleButton.className = "role-action-btn";
+                roleButton.textContent = account.role === "user" ? "PROMOTE" : "DEMOTE";
+                roleButton.dataset.userId = account.id;
+                roleButton.dataset.userName = account.full_name || "this account";
+                roleButton.dataset.newRole = account.role === "user" ? "admin" : "user";
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "delete-account-btn";
+                deleteButton.textContent = "DELETE";
+                deleteButton.dataset.userId = account.id;
+                deleteButton.dataset.userName = account.full_name || "this account";
+                actionGroup.append(roleButton, deleteButton);
+            }
             actionsCell.appendChild(actionGroup);
         }
 
@@ -852,16 +864,59 @@ accountsTable.addEventListener("click", async event => {
 });
 
 
-/* SEARCH AND FILTER */
+/* SECTION NAVIGATION AND VIEW-SPECIFIC FILTERS */
+const managementPanel = document.getElementById("account-management");
+const managementTitle = document.getElementById("managementTitle");
+const roleFilter = document.getElementById("roleFilter");
+const addAdminButton = document.getElementById("openAdminModal");
+const quickLinks = document.querySelector(".quick-links");
+const statsCards = document.querySelector(".cards");
+const topbarTitle = document.querySelector(".topbar h1");
+const topbarDescription = document.querySelector(".topbar p");
+const menuItems = document.querySelectorAll(".sidebar .menu-item");
+let currentView = "overview";
 
-document.getElementById("searchInput")
-    .addEventListener("input", renderAccounts);
-
-document.getElementById("roleFilter")
-    .addEventListener("change", renderAccounts);
-
-document.getElementById("refreshButton")
-    .addEventListener("click", loadAccounts);
+function setView(view) {
+    currentView = view;
+    if (view === "user-management") { window.location.href = "user.html"; return; }
+    const overview = view === "overview";
+    quickLinks.style.display = overview ? "grid" : "none";
+    statsCards.style.display = overview ? "grid" : "none";
+    managementPanel.style.display = overview ? "none" : "block";
+    if (view === "admin-management") {
+        topbarTitle.textContent = "Admin Management";
+        topbarDescription.textContent = "View and manage administrator accounts.";
+        managementTitle.textContent = "Administrator Accounts";
+        roleFilter.value = "admin"; roleFilter.disabled = true;
+        addAdminButton.style.display = "inline-block";
+    } else if (view === "role-management") {
+        topbarTitle.textContent = "Role Management";
+        topbarDescription.textContent = "Promote users to admins and demote admins to users.";
+        managementTitle.textContent = "Manage Account Roles";
+        roleFilter.value = "all"; roleFilter.disabled = true;
+        addAdminButton.style.display = "none";
+    } else {
+        topbarTitle.textContent = "Dashboard Overview";
+        topbarDescription.textContent = "Welcome to JJCC Railways Administration.";
+        roleFilter.value = "all"; roleFilter.disabled = false;
+        addAdminButton.style.display = "inline-block";
+    }
+    menuItems.forEach(item => item.classList.remove("active"));
+    const href = view === "admin-management" ? "#admin-management" : view === "role-management" ? "#role-management" : "dashboard-superadmin.html";
+    const active = [...menuItems].find(item => item.getAttribute("href") === href);
+    if (active) active.classList.add("active");
+    renderAccounts();
+}
+function readViewFromHash() {
+    const hash = location.hash.toLowerCase();
+    if (hash === "#admin-management" || hash === "#account-management") setView("admin-management");
+    else if (hash === "#role-management") setView("role-management");
+    else setView("overview");
+}
+window.addEventListener("hashchange", readViewFromHash);
+document.getElementById("searchInput").addEventListener("input", renderAccounts);
+roleFilter.addEventListener("change", renderAccounts);
+document.getElementById("refreshButton").addEventListener("click", loadAccounts);
 
 
 /* LOGOUT */
@@ -1033,6 +1088,7 @@ async function initializeDashboard() {
 
     if (authorized) {
         await loadAccounts();
+        readViewFromHash();
     }
 }
 
